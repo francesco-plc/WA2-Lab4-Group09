@@ -1,7 +1,6 @@
 package it.polito.wa2.wa2lab4group09.entities
 
-import java.text.DateFormat
-import java.util.Date
+import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
@@ -11,7 +10,7 @@ class UserDetails(
     var name: String,
     var surname: String,
     var address: String,
-    var date_of_birth: Date,
+    var date_of_birth: LocalDate,
     var telephone_number: Int,
 ) : EntityBase<Long>() {
 
