@@ -18,7 +18,7 @@ import java.util.*
 @SpringBootTest
 class RepositoriesTest {
 
-    @Autowired
+    /*@Autowired
     lateinit var userDetailsRepository: UserDetailsRepository
 
     @Autowired
@@ -28,7 +28,7 @@ class RepositoriesTest {
         "nameTest",
         "surnameTest",
         "addressTest",
-        LocalDate.of(1990,12,12)/*.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))*/,
+        LocalDate.of(1990,12,12)*//*.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))*//*,
         1234567890,
     )
 
@@ -64,7 +64,7 @@ class RepositoriesTest {
 
         val count = userDetailsRepository.count()
         assertEquals(count, 0)
-    }
+    }*/
 }
 
 

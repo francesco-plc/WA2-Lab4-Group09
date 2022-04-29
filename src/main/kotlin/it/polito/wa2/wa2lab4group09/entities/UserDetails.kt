@@ -7,13 +7,15 @@ import javax.persistence.*
 @Table(name = "user_details")
 class UserDetails(
 
-    var name: String,
-    var surname: String,
-    var address: String,
-    var date_of_birth: LocalDate,
-    var telephone_number: Int,
-) : EntityBase<Long>() {
+    @Id
+    var username : String,
+    var name: String? = null,
+    var surname: String? = null,
+    var address: String? = null,
+    var date_of_birth: LocalDate? = null,
+    var telephone_number: Int? = null
+){
 
     @OneToMany(mappedBy = "userDetails")
-    val tickets = mutableListOf<TicketPurchased>()
+    val tickets : List<TicketPurchased> = mutableListOf()
 }

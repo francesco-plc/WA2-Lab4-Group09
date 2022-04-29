@@ -7,10 +7,10 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserDetailsRepository: CrudRepository<UserDetails, Long> {
+interface UserDetailsRepository: CrudRepository<UserDetails, String> {
 
     @Modifying
-    @Query("update UserDetails set telephone_number = :new_number where id = :id")
-    fun updateTelephone(new_number: Int, id: Long)
+    @Query("update UserDetails set telephone_number = :new_number where username = :username")
+    fun updateTelephone(new_number: Int, username : String)
 
 }
