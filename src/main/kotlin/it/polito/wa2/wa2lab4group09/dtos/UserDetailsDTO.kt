@@ -8,8 +8,8 @@ data class UserDetailsDTO(
     var name: String? = null,
     var surname: String? = null,
     var address: String?= null,
-    var date_of_birth: LocalDate? = null,
-    var telephone_number: Int? = null
+    var date_of_birth: String? = null,
+    var telephone_number: String? = null
 )
 
 fun UserDetails.toDTO(): UserDetailsDTO{
