@@ -14,9 +14,16 @@ import org.springframework.web.bind.annotation.RestController
 class MyController(val userDetailsService: UserDetailsService) {
 
     @GetMapping("/my/profile")
-    fun getUserDetails(@RequestHeader("application.jwt.jwtHeader") jwt:String) : ResponseEntity<Any>{
-        return if(JwtUtils.validateJwtToken(jwt)){
-            ResponseEntity(userDetailsService.getUserDetails(jwt),HttpStatus.OK)
-        } else ResponseEntity("Invalid Token", HttpStatus.BAD_REQUEST)
+    fun getUserDetails(@RequestHeader("Authorization") jwt:String) : Any{
+        println(jwt)
+        val newToken = jwt.replace("Bearer", "")
+        println(newToken)
+        return try {
+            userDetailsService.getUserDetails(newToken)
+        } catch (t : Throwable){
+            println("${t.message}")
+        }
     }
+    @GetMapping("/hello")
+    fun hello():String="Hello!"
 }
