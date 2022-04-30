@@ -17,5 +17,12 @@ class UserDetails(
 ){
 
     @OneToMany(mappedBy = "userDetails")
-    val tickets : List<TicketPurchased> = mutableListOf()
+    val tickets = mutableSetOf<TicketPurchased>()
+
+    fun addTicket(t : TicketPurchased): TicketPurchased {
+        t.userDetails = this
+        tickets.add(t)
+        return t
+    }
+
 }

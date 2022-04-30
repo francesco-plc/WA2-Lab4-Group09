@@ -26,8 +26,6 @@ class MyController(val userDetailsService: UserDetailsService) {
             println("${t.message}")
         }
     }
-    @GetMapping("/hello")
-    fun hello():String="Hello!"
 
     @PutMapping("/my/profile")
     fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsDTO: UserDetailsDTO) : ResponseEntity<Unit>{
@@ -40,4 +38,28 @@ class MyController(val userDetailsService: UserDetailsService) {
             ResponseEntity(HttpStatus.BAD_REQUEST)
         }
     }
+
+    @GetMapping("/my/tickets")
+    fun getUserTickets(@RequestHeader("Authorization") jwt:String) : Any{
+        val newToken = jwt.replace("Bearer", "")
+        return try {
+            userDetailsService.getUserTickets(newToken)
+        } catch (t : Throwable){
+            println("${t.message}")
+        }
+    }
+
+    @PostMapping("/my/tickets")
+    fun buyTickets(@RequestHeader("Authorization") jwt:String, @RequestBody actionTicket: actionTicket) : ResponseEntity<Any>{
+        val newToken = jwt.replace("Bearer", "")
+        return try {
+            val body = userDetailsService.buyTickets(newToken,actionTicket)
+            ResponseEntity(body, HttpStatus.OK)
+        } catch (t : Throwable){
+            println(t.message)
+            ResponseEntity("${t.message}", HttpStatus.BAD_REQUEST)
+        }
+    }
 }
+
+data class actionTicket(val cmd : String, val quantity : Int, val zones : String)
