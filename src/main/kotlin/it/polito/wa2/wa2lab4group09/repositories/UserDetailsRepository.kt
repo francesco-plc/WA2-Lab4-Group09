@@ -14,4 +14,7 @@ interface UserDetailsRepository: CrudRepository<UserDetails, String> {
     @Query("update UserDetails set name = :newName, surname = :newSurname, address = :newAddress, date_of_birth = :newDate_of_birth, telephone_number = :new_number where username = :username")
     fun updateUserDetails(newName : String?, newSurname:String?, newAddress:String?, newDate_of_birth : String?, new_number: String?, username : String)
 
+    @Query("select username from UserDetails")
+    fun getUsers():List<String>
+
 }
