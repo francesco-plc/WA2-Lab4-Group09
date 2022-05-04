@@ -2,7 +2,7 @@ package it.polito.wa2.wa2lab4group09.services
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
-import it.polito.wa2.wa2lab4group09.controllers.actionTicket
+import it.polito.wa2.wa2lab4group09.controllers.ActionTicket
 import it.polito.wa2.wa2lab4group09.dtos.TicketPurchasedDTO
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
@@ -74,7 +74,7 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
         return tickets
     }
 
-    fun buyTickets(jwt: String, actionTicket: actionTicket): MutableList<TicketPurchasedDTO> {
+    fun buyTickets(jwt: String, actionTicket: ActionTicket): MutableList<TicketPurchasedDTO> {
         if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
@@ -85,10 +85,15 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
                     .setIssuedAt(Date.from(Instant.now()))
                     .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                     .signWith(Keys.hmacShaKeyFor(keyTicket.toByteArray())).compact()
-                val t = UserDetails(userDetailsDTO.username).addTicket(TicketPurchased(
-                    Timestamp(System.currentTimeMillis()),
-                    Timestamp(System.currentTimeMillis()+ 3600000),
-                    actionTicket.zones,token))
+                val t = UserDetails(userDetailsDTO.username)
+                    .addTicket(
+                        TicketPurchased(
+                            Timestamp(System.currentTimeMillis()),
+                            Timestamp(System.currentTimeMillis() + 3600000),
+                            actionTicket.zones,
+                            token
+                        )
+                    )
                 tickets.add(t.toDTO())
                 ticketPurchasedRepository.save(t)
             }

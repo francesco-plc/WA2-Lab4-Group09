@@ -1,6 +1,9 @@
 package it.polito.wa2.wa2lab4group09
 
 
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
+import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
 import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
@@ -9,44 +12,73 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.TestPropertySource
 import org.springframework.transaction.annotation.Transactional
+import java.sql.Timestamp
+import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 @SpringBootTest
 class RepositoriesTest {
 
-    /*@Autowired
+    @Autowired
     lateinit var userDetailsRepository: UserDetailsRepository
 
     @Autowired
     lateinit var ticketPurchasedRepository: TicketPurchasedRepository
 
-    val userDetailsEntity = UserDetails(
+
+    final var keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
+
+    private final val userDetailsEntity = UserDetails(
         "nameTest",
         "surnameTest",
         "addressTest",
-        LocalDate.of(1990,12,12)*//*.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))*//*,
-        1234567890,
+        LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+        "1234567890"
+    )
+
+//    private final val token: String = Jwts.builder()
+//        .setSubject(userDetailsEntity.username)
+//        .setIssuedAt(Date.from(Instant.now()))
+//        .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+//        .signWith(Keys.hmacShaKeyFor(keyTicket.toByteArray())).compact()
+
+    val ticketPurchasedEntity = TicketPurchased(
+        Timestamp(System.currentTimeMillis()),
+        Timestamp(System.currentTimeMillis()+ 3600000),
+        "ABC",
+        Jwts.builder()
+            .setSubject(userDetailsEntity.username)
+            .setIssuedAt(Date.from(Instant.now()))
+            .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+            .signWith(Keys.hmacShaKeyFor(keyTicket.toByteArray())).compact()
     )
 
     @BeforeEach
     @Test
-    fun createUserDetails(){
+    fun createUserDetailsAndTicketPurchased(){
         userDetailsRepository.save(userDetailsEntity)
+        userDetailsEntity.addTicket(ticketPurchasedEntity)
 
-        val count = userDetailsRepository.count()
-        assertEquals(count, 1)
+        val countUserDetails = userDetailsRepository.count()
+        val countTicketPurchased = userDetailsEntity.tickets.count()
+
+        assertEquals(1, countUserDetails)
+        assertEquals(1, countTicketPurchased)
     }
 
     @Test
     fun userDetailsExist(){
         val entity = userDetailsRepository.findAll()
-        val userDetailsFound = userDetailsRepository.findById(entity.first().getId()!!).unwrap()
+        val userDetailsFound = userDetailsRepository.findById(entity.first().username).unwrap()
 
-        assertEquals(userDetailsFound, userDetailsEntity)
+        assertEquals(userDetailsFound!!.username, userDetailsEntity.username)
     }
 
     @Test
@@ -54,17 +86,32 @@ class RepositoriesTest {
     fun updateUserDetails(){
         val entity = userDetailsRepository.findAll()
 
-        userDetailsRepository.updateTelephone(1111111111, entity.first().getId()!!)
+        userDetailsRepository.updateUserDetails(
+            "newName",
+            "newSurname",
+            "newAddress",
+            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            "1111111111",
+            entity.first().username)
     }
+
+
+
+
 
     @AfterEach
     @Test
     fun deleteUserDetails(){
         userDetailsRepository.delete(userDetailsEntity)
 
-        val count = userDetailsRepository.count()
-        assertEquals(count, 0)
-    }*/
+        val countUserDetails = userDetailsRepository.count()
+        val countTicketPurchased = ticketPurchasedRepository.count()
+
+        assertEquals(0, countUserDetails)
+        assertEquals(0, countTicketPurchased)
+    }
+
+
 }
 
 

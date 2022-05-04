@@ -1,9 +1,9 @@
 package it.polito.wa2.wa2lab4group09.controllers
 
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
-import it.polito.wa2.wa2lab4group09.security.JwtUtils
 import it.polito.wa2.wa2lab4group09.services.UserDetailsService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -39,18 +39,20 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
-    @GetMapping("/my/tickets")
-    fun getUserTickets(@RequestHeader("Authorization") jwt:String) : Any{
+    @GetMapping("/my/tickets", produces = [MediaType.APPLICATION_NDJSON_VALUE])
+    fun getUserTickets(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
         return try {
-            userDetailsService.getUserTickets(newToken)
+            val body = userDetailsService.getUserTickets(newToken)
+            ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
-            println("${t.message}")
+            val body = ErrorMessage(t.message)
+            ResponseEntity(body, HttpStatus.BAD_REQUEST)
         }
     }
 
     @PostMapping("/my/tickets")
-    fun buyTickets(@RequestHeader("Authorization") jwt:String, @RequestBody actionTicket: actionTicket) : ResponseEntity<Any>{
+    fun buyTickets(@RequestHeader("Authorization") jwt:String, @RequestBody actionTicket: ActionTicket) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
         return try {
             val body = userDetailsService.buyTickets(newToken,actionTicket)
@@ -62,4 +64,6 @@ class MyController(val userDetailsService: UserDetailsService) {
     }
 }
 
-data class actionTicket(val cmd : String, val quantity : Int, val zones : String)
+data class ActionTicket(val cmd : String, val quantity : Int, val zones : String)
+//to return a JSON-shaped error
+data class ErrorMessage(val error: String?)
