@@ -16,26 +16,28 @@ import org.springframework.web.bind.annotation.RestController
 class MyController(val userDetailsService: UserDetailsService) {
 
     @GetMapping("/my/profile")
-    fun getUserDetails(@RequestHeader("Authorization") jwt:String) : Any{
+    fun getUserDetails(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         println(jwt)
         val newToken = jwt.replace("Bearer", "")
         println(newToken)
         return try {
             userDetailsService.getUserDetails(newToken)
+            ResponseEntity(HttpStatus.OK)
         } catch (t : Throwable){
-            println("${t.message}")
+            val error = ErrorMessage(t.message)
+            ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }
 
     @PutMapping("/my/profile")
-    fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsDTO: UserDetailsDTO) : ResponseEntity<Unit>{
+    fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsDTO: UserDetailsDTO) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
         return try {
             userDetailsService.updateUserDetails(newToken,userDetailsDTO)
             ResponseEntity(HttpStatus.OK)
         } catch (t : Throwable){
-            println("${t.message}")
-            ResponseEntity(HttpStatus.BAD_REQUEST)
+            val error = ErrorMessage(t.message)
+            ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -46,8 +48,8 @@ class MyController(val userDetailsService: UserDetailsService) {
             val body = userDetailsService.getUserTickets(newToken)
             ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
-            val body = ErrorMessage(t.message)
-            ResponseEntity(body, HttpStatus.BAD_REQUEST)
+            val error = ErrorMessage(t.message)
+            ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -58,8 +60,8 @@ class MyController(val userDetailsService: UserDetailsService) {
             val body = userDetailsService.buyTickets(newToken,actionTicket)
             ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
-            println(t.message)
-            ResponseEntity("${t.message}", HttpStatus.BAD_REQUEST)
+            val error = ErrorMessage(t.message)
+            ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }
 }
