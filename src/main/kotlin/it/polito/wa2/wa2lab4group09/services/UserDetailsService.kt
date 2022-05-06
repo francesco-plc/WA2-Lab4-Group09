@@ -42,26 +42,19 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     @Transactional
     fun updateUserDetails(jwt:String, userDetailsDTO: UserDetailsDTO){
         if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
-        if(userDetailsRepository.existsById(JwtUtils.getDetailsFromJwtToken(jwt,key).username)) {
-            userDetailsRepository.updateUserDetails(
-                userDetailsDTO.name,
-                userDetailsDTO.surname,
-                userDetailsDTO.address,
-                userDetailsDTO.date_of_birth.toString(),
-                userDetailsDTO.telephone_number,
-                JwtUtils.getDetailsFromJwtToken(jwt, key).username
-            )
-        } else {
+
+        if(!userDetailsRepository.existsById(JwtUtils.getDetailsFromJwtToken(jwt,key).username)) {
             userDetailsRepository.save(UserDetails(userDetailsDTO.username))
-            userDetailsRepository.updateUserDetails(
-                userDetailsDTO.name,
-                userDetailsDTO.surname,
-                userDetailsDTO.address,
-                userDetailsDTO.date_of_birth.toString(),
-                userDetailsDTO.telephone_number,
-                JwtUtils.getDetailsFromJwtToken(jwt, key).username
-            )
         }
+        userDetailsRepository.updateUserDetails(
+            userDetailsDTO.name,
+            userDetailsDTO.surname,
+            userDetailsDTO.address,
+            userDetailsDTO.date_of_birth.toString(),
+            userDetailsDTO.telephone_number,
+            JwtUtils.getDetailsFromJwtToken(jwt, key).username
+        )
+
     }
 
     fun getUserTickets(jwt:String): List<TicketPurchasedDTO> {
