@@ -6,7 +6,6 @@ import io.jsonwebtoken.security.Keys
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
 import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
-import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
 import it.polito.wa2.wa2lab4group09.services.unwrap
 import org.junit.jupiter.api.AfterEach
@@ -14,9 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
 import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 import java.time.Instant
@@ -24,8 +21,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
-import java.util.Optional.empty
-import javax.swing.text.html.Option
 
 @SpringBootTest
 class RepositoriesTest {
@@ -69,10 +64,9 @@ class RepositoriesTest {
 
     @Test
     fun userDetailsExist(){
-        val entity = userDetailsRepository.findAll()
-        val userDetailsFound = userDetailsRepository.findById(entity.last().username).unwrap()
+        val userDetailsActual = userDetailsRepository.existsById(userDetailsEntity.username)
 
-        assertEquals(userDetailsFound!!.username, userDetailsEntity.username)
+        assertEquals(true, userDetailsActual)
     }
 
     @Test
@@ -106,5 +100,3 @@ class RepositoriesTest {
 }
 
 
-//extension function to get a Type from an Optional<Type>
-fun <T> Optional<T>.unwrap(): T? = orElse(null)

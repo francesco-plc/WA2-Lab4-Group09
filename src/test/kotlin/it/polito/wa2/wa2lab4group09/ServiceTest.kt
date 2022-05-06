@@ -2,6 +2,7 @@ package it.polito.wa2.wa2lab4group09
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import it.polito.wa2.wa2lab4group09.controllers.ActionTicket
 import it.polito.wa2.wa2lab4group09.dtos.TicketPurchasedDTO
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
@@ -68,15 +69,6 @@ class ServiceTest {
             .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
     }
 
-    fun generateTicketToken(key: String): String{
-        return Jwts.builder()
-            .setSubject(userDetailsEntity.username)
-            .setIssuedAt(Date.from(Instant.now()))
-            .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-            .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
-    }
-
-
     @BeforeEach
     @Test
     fun createUserDetails(){
@@ -133,7 +125,7 @@ class ServiceTest {
     @Test
     fun updateNewUserDetailsValidToken(){
         val updatedUserDetailsDTO = UserDetailsDTO(
-            "newUsernameTest",
+            "usernameTest",
             "updatedNameTest",
             "updatedSurnameTest",
             "updatedAddressTest",
@@ -180,7 +172,8 @@ class ServiceTest {
 
     }
 
-//    todo -> fix something ???
+/*    todo -> fix fun "addTicket()" in  UserDetails: since it returns the same ticket added,
+              the sub field we get is null instead we need it to be the correct id */
 //    @Test
 //    fun getUserTicketsValidToken(){
 //        val expectedTickets = userDetailsEntity.tickets.map { it.toDTO() }
@@ -188,9 +181,76 @@ class ServiceTest {
 //        assertEquals(expectedTickets, actualTicket)
 //    }
 
+    @Test
+    fun getUserTicketsInvalidTokenSignature(){
+        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.getUserTickets(generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"))
+        }
+        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
+    }
+
+    @Test
+    fun getUserTicketsInvalidExpiredToken(){
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.getUserTickets(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))))
+        }
+    }
+
+/*    todo -> fix fun "addTicket()" in  UserDetails: since it returns the same ticket added,
+              the sub field we get is null instead we need it to be the correct id */
+//    @Test
+//    fun buyTicketValidTokenAndCommand(){
+//
+//        val actualTickets = userDetailsService.buyTickets(
+//            generateUserToken(_keyUser),
+//            ActionTicket("buy_tickets", 3, "ABC")
+//        )
+//
+//        val expectedTickets = ticketPurchasedRepository.findByUserDetails(userDetailsEntity).map{it.toDTO()}
+//        assertEquals(expectedTickets, actualTickets)
+//    }
+
+    @Test
+    fun buyTicketInvalidCommand(){
+
+        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.buyTickets(
+                generateUserToken(_keyUser),
+                ActionTicket("ThisIsAnInvalidCommand", 3, "ABC")
+            )
+        }
+        assertEquals("action is not supported", exception.message.toString())
+    }
+
+    @Test
+    fun buyTicketInvalidTokenSignature(){
+
+        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.buyTickets(
+                generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"),
+                ActionTicket("buy_tickets", 3, "ABC")
+            )
+        }
+        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
+    }
+
+    @Test
+    fun buyTicketsInvalidExpiredToken(){
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.buyTickets(
+                generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"),
+                ActionTicket("buy_tickets", 3, "ABC")
+            )
+        }
+    }
+
+
     @AfterEach
     @Test
     fun deleteUserDetails(){
+        ticketPurchasedRepository.deleteAllByUserDetails(userDetailsEntity)
         userDetailsRepository.delete(userDetailsEntity)
 
         val userDetailsFound = userDetailsRepository.existsById(userDetailsEntity.username)

@@ -67,7 +67,7 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
         return tickets
     }
 
-    fun buyTickets(jwt: String, actionTicket: ActionTicket): MutableList<TicketPurchasedDTO> {
+    fun buyTickets(jwt: String, actionTicket: ActionTicket): List<TicketPurchasedDTO> {
         if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
