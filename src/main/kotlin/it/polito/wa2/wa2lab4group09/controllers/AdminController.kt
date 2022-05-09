@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class AdminController(val adminService: AdminService) {
 
-    //@Secured("ADMIN")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/travelers")
     fun getTravelers(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
@@ -26,7 +25,7 @@ class AdminController(val adminService: AdminService) {
         }
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/traveler/{userID}/profile")
     fun getTravelerProfile(@PathVariable userID:String, @RequestHeader("Authorization") jwt:String) :  ResponseEntity<Any>{
         println(jwt)
@@ -41,7 +40,7 @@ class AdminController(val adminService: AdminService) {
         }
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/traveler/{userID}/tickets")
     fun getTravelerTickets(@PathVariable userID:String, @RequestHeader("Authorization") jwt:String) : Any{
         val newToken = jwt.replace("Bearer", "")

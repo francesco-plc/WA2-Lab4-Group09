@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MyController(val userDetailsService: UserDetailsService) {
-    @Secured("ROLE_CUSTOMER", "ROLE_ADMIN")
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/my/profile")
     fun getUserDetails(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
@@ -30,7 +31,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
-    @Secured("ROLE_CUSTOMER", "ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @PutMapping("/my/profile")
     fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsDTO: UserDetailsDTO) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
@@ -43,7 +44,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
-    @Secured("ROLE_CUSTOMER", "ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/my/tickets", produces = [MediaType.APPLICATION_NDJSON_VALUE])
     fun getUserTickets(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
@@ -56,7 +57,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
-    @Secured("ROLE_CUSTOMER", "ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @PostMapping("/my/tickets")
     fun buyTickets(@RequestHeader("Authorization") jwt:String, @RequestBody actionTicket: ActionTicket) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")

@@ -43,7 +43,7 @@ class JWTAuthorizationFilter(
             val userDetailsDTO = JwtUtils.getDetailsFromJwtToken(token.replace("Bearer", ""), key)
             println(userDetailsDTO)
             var authorities = HashSet<GrantedAuthority>(1)
-            authorities.add(SimpleGrantedAuthority(userDetailsDTO.role.toString()))
+            authorities.add(SimpleGrantedAuthority("ROLE_"+userDetailsDTO.role.toString()))
             println("getauth. username")
             println(userDetailsDTO.username)
             println("getauth. auth")
