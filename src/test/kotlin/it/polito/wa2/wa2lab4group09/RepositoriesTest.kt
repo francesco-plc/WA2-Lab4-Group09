@@ -24,7 +24,7 @@ import java.util.*
 
 @SpringBootTest
 class RepositoriesTest {
-
+/*
     @Autowired
     lateinit var userDetailsRepository: UserDetailsRepository
 
@@ -97,6 +97,8 @@ class RepositoriesTest {
         assertEquals( false, userDetailsFound)
     }
 
+
+ */
 }
 
 
