@@ -5,6 +5,8 @@ import it.polito.wa2.wa2lab4group09.services.UserDetailsService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -15,20 +17,21 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MyController(val userDetailsService: UserDetailsService) {
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/my/profile")
     fun getUserDetails(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
-        println(jwt)
         val newToken = jwt.replace("Bearer", "")
-        println(newToken)
         return try {
-            userDetailsService.getUserDetails(newToken)
-            ResponseEntity(HttpStatus.OK)
+            val body = userDetailsService.getUserDetails(newToken)
+            ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
             val error = ErrorMessage(t.message)
+            println(error)
             ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @PutMapping("/my/profile")
     fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsDTO: UserDetailsDTO) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
@@ -41,6 +44,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/my/tickets", produces = [MediaType.APPLICATION_NDJSON_VALUE])
     fun getUserTickets(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
@@ -53,6 +57,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @PostMapping("/my/tickets")
     fun buyTickets(@RequestHeader("Authorization") jwt:String, @RequestBody actionTicket: ActionTicket) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")

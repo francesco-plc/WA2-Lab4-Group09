@@ -11,7 +11,9 @@ import it.polito.wa2.wa2lab4group09.entities.UserDetails
 import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
 import it.polito.wa2.wa2lab4group09.security.JwtUtils
+import it.polito.wa2.wa2lab4group09.security.Role
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
 import java.time.Instant
@@ -29,22 +31,25 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     lateinit var keyTicket : String
 
     fun getUserDetails(jwt : String): UserDetailsDTO {
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
-        val userDetailsDTO = JwtUtils.getDetailsFromJwtToken(jwt,key)
-        val userDetail = userDetailsRepository.findById(userDetailsDTO.username).unwrap()
+        //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
+        val authentication = SecurityContextHolder.getContext().authentication
+        println(authentication.name)
+        println(authentication.authorities.first().toString())
+        val role = if(authentication.authorities.first().toString()=="CUSTOMER") Role.CUSTOMER else Role.ADMIN
+        val userDetail = userDetailsRepository.findById(authentication.name).unwrap()
         return if(userDetail == null){
-            userDetailsRepository.save(UserDetails(userDetailsDTO.username))
-            userDetailsDTO
+            userDetailsRepository.save(UserDetails(authentication.name, role= role))
+            UserDetails(authentication.name, role= role).toDTO()
         }else
             userDetail.toDTO()
     }
 
     @Transactional
     fun updateUserDetails(jwt:String, userDetailsDTO: UserDetailsDTO){
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
+        //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
 
         if(!userDetailsRepository.existsById(JwtUtils.getDetailsFromJwtToken(jwt,key).username)) {
-            userDetailsRepository.save(UserDetails(userDetailsDTO.username))
+            userDetailsRepository.save(UserDetails(userDetailsDTO.username, role= userDetailsDTO.role))
         }
         userDetailsRepository.updateUserDetails(
             userDetailsDTO.name,
@@ -58,17 +63,17 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     }
 
     fun getUserTickets(jwt:String): List<TicketPurchasedDTO> {
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
+       // if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
-        ticketPurchasedRepository.findByUserDetails(UserDetails(userDetailsDTO.username)).forEach {
+        ticketPurchasedRepository.findByUserDetails(UserDetails(userDetailsDTO.username, role= userDetailsDTO.role)).forEach {
             tickets.add(TicketPurchasedDTO(it.sub, it.iat, it.exp, it.zid, it.jws))
         }
         return tickets
     }
 
     fun buyTickets(jwt: String, actionTicket: ActionTicket): List<TicketPurchasedDTO> {
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
+        //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
         if (actionTicket.cmd == "buy_tickets"){
@@ -78,7 +83,7 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
                     .setIssuedAt(Date.from(Instant.now()))
                     .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                     .signWith(Keys.hmacShaKeyFor(keyTicket.toByteArray())).compact()
-                val t = UserDetails(userDetailsDTO.username)
+                val t = UserDetails(userDetailsDTO.username, role= userDetailsDTO.role)
                     .addTicket(
                         TicketPurchased(
                             Timestamp(System.currentTimeMillis()),

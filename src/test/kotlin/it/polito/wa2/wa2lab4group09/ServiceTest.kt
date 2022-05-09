@@ -3,7 +3,6 @@ package it.polito.wa2.wa2lab4group09
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import it.polito.wa2.wa2lab4group09.controllers.ActionTicket
-import it.polito.wa2.wa2lab4group09.dtos.TicketPurchasedDTO
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
 import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
@@ -25,7 +24,7 @@ import java.util.*
 
 @SpringBootTest
 class ServiceTest {
-
+/*
     @Autowired
     lateinit var userDetailsRepository: UserDetailsRepository
 
@@ -60,7 +59,7 @@ class ServiceTest {
     )
 
 
-    fun generateUserToken(key: String,sub: String? = userDetailsEntity.username,  exp: Date? = Date.from(Instant.now().plus(1, ChronoUnit.HOURS))): String{
+    fun generateUserToken(key: String, sub: String? = userDetailsEntity.username, exp: Date? = Date.from(Instant.now().plus(1, ChronoUnit.HOURS))): String{
         return Jwts.builder()
             .setSubject(sub)
             .setIssuedAt(Date.from(Instant.now()))
@@ -256,6 +255,8 @@ class ServiceTest {
         val userDetailsFound = userDetailsRepository.existsById(userDetailsEntity.username)
         assertEquals( false, userDetailsFound)
     }
+
+ */
 
 }
 
