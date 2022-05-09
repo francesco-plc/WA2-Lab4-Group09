@@ -8,6 +8,10 @@ import javax.persistence.*
 @Entity
 @Table(name="ticket_purchased")
 class TicketPurchased (
+    @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name="uuid2", strategy="uuid2")
+    var sub: UUID,
     var iat: Timestamp,
     var exp: Timestamp,
     var zid: String,
@@ -16,8 +20,5 @@ class TicketPurchased (
     @JoinColumn(name = "user_details_username")
     var userDetails: UserDetails? = null
 ){
-    @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name="uuid2", strategy="uuid2")
-    var sub: UUID? = null
+
 }

@@ -14,9 +14,9 @@ import javax.servlet.http.HttpServletResponse
 
 class JWTAuthorizationFilter(
     authManager: AuthenticationManager,
-    val jwtHeader: String,
-    val jwtHeaderStart: String,
-    val key: String
+    private val jwtHeader: String,
+    private val jwtHeaderStart: String,
+    private val key: String
 ) : BasicAuthenticationFilter(authManager) {
 
     @Throws(IOException::class, ServletException::class)
@@ -38,16 +38,10 @@ class JWTAuthorizationFilter(
 
     private fun getAuthentication(token: String): UsernamePasswordAuthenticationToken? {
         return try {
-            println("getAuthentication")
             JwtUtils.validateJwtToken( token.replace("Bearer", ""), key)
             val userDetailsDTO = JwtUtils.getDetailsFromJwtToken(token.replace("Bearer", ""), key)
-            println(userDetailsDTO)
-            var authorities = HashSet<GrantedAuthority>(1)
+            val authorities = HashSet<GrantedAuthority>(1)
             authorities.add(SimpleGrantedAuthority("ROLE_"+userDetailsDTO.role.toString()))
-            println("getauth. username")
-            println(userDetailsDTO.username)
-            println("getauth. auth")
-            println(authorities)
             UsernamePasswordAuthenticationToken(userDetailsDTO.username, null, authorities)
         } catch (e: Exception) {
             println(e)

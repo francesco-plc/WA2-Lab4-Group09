@@ -14,9 +14,6 @@ class AdminService(val userDetailsRepository: UserDetailsRepository, val ticketP
     @Value("\${application.jwt.jwtSecret}")
     lateinit var key: String
 
-    @Value("\${application.jwt.jwtSecretTicket}")
-    lateinit var keyTicket : String
-
     fun getTravelers(jwt:String): List<String> {
         if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val travelers = mutableListOf<String>()

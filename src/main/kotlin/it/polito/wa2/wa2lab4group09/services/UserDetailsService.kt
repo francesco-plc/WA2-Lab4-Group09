@@ -46,8 +46,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
 
     @Transactional
     fun updateUserDetails(jwt:String, userDetailsDTO: UserDetailsDTO){
-        //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
-
         if(!userDetailsRepository.existsById(JwtUtils.getDetailsFromJwtToken(jwt,key).username)) {
             userDetailsRepository.save(UserDetails(userDetailsDTO.username, role= userDetailsDTO.role))
         }
@@ -63,7 +61,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     }
 
     fun getUserTickets(jwt:String): List<TicketPurchasedDTO> {
-       // if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
         ticketPurchasedRepository.findByUserDetails(UserDetails(userDetailsDTO.username, role= userDetailsDTO.role)).forEach {
@@ -73,7 +70,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     }
 
     fun buyTickets(jwt: String, actionTicket: ActionTicket): List<TicketPurchasedDTO> {
-        //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
         if (actionTicket.cmd == "buy_tickets"){
@@ -86,6 +82,7 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
                 val t = UserDetails(userDetailsDTO.username, role= userDetailsDTO.role)
                     .addTicket(
                         TicketPurchased(
+                            UUID.randomUUID(),
                             Timestamp(System.currentTimeMillis()),
                             Timestamp(System.currentTimeMillis() + 3600000),
                             actionTicket.zones,
@@ -96,7 +93,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
                 ticketPurchasedRepository.save(t)
             }
         } else throw IllegalArgumentException("action is not supported")
-
         return tickets
     }
 }

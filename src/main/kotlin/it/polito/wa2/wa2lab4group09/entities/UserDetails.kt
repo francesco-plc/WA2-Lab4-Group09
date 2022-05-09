@@ -1,7 +1,6 @@
 package it.polito.wa2.wa2lab4group09.entities
 
 import it.polito.wa2.wa2lab4group09.security.Role
-import org.springframework.security.core.GrantedAuthority
 import javax.persistence.*
 
 
