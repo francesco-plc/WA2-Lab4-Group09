@@ -1,7 +1,7 @@
 package it.polito.wa2.wa2lab4group09.dtos
 
+import it.polito.wa2.wa2lab4group09.entities.Role
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
-import it.polito.wa2.wa2lab4group09.security.Role
 
 data class UserDetailsDTO(
     var username: String,

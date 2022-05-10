@@ -7,12 +7,12 @@ import it.polito.wa2.wa2lab4group09.controllers.UserDetailsUpdate
 import it.polito.wa2.wa2lab4group09.dtos.TicketPurchasedDTO
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
+import it.polito.wa2.wa2lab4group09.entities.Role
 import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
 import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
 import it.polito.wa2.wa2lab4group09.security.JwtUtils
-import it.polito.wa2.wa2lab4group09.security.Role
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -34,9 +34,8 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     fun getUserDetails(jwt : String): UserDetailsDTO {
         //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val authentication = SecurityContextHolder.getContext().authentication
-        println(authentication.name)
-        println(authentication.authorities.first().toString())
         val role = if(authentication.authorities.first().toString()=="ROLE_CUSTOMER") Role.CUSTOMER else Role.ADMIN
+        println(role)
         val userDetail = userDetailsRepository.findById(authentication.name).unwrap()
         return if(userDetail == null){
             userDetailsRepository.save(UserDetails(authentication.name, role= role))
@@ -85,11 +84,10 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
                 val t = UserDetails(userDetailsDTO.username, role= userDetailsDTO.role)
                     .addTicket(
                         TicketPurchased(
-                            UUID.randomUUID(),
-                            Timestamp(System.currentTimeMillis()),
-                            Timestamp(System.currentTimeMillis() + 3600000),
-                            actionTicket.zones,
-                            token
+                            iat = Timestamp(System.currentTimeMillis()),
+                            exp = Timestamp(System.currentTimeMillis() + 3600000),
+                            zid = actionTicket.zones,
+                            jws = token
                         )
                     )
                 tickets.add(t.toDTO())

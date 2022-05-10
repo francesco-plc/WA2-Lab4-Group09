@@ -43,3 +43,9 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+dependencyManagement {
+    imports {
+        mavenBom("org.testcontainers:testcontainers-bom:1.16.3")
+    }
+}

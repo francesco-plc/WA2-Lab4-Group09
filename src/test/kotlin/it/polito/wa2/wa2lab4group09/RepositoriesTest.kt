@@ -7,6 +7,8 @@ import it.polito.wa2.wa2lab4group09.dtos.toDTO
 import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
+import it.polito.wa2.wa2lab4group09.entities.Role
+import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.services.unwrap
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -24,49 +26,48 @@ import java.util.*
 
 @SpringBootTest
 class RepositoriesTest {
-/*
     @Autowired
     lateinit var userDetailsRepository: UserDetailsRepository
+    @Autowired
+    lateinit var ticketPurchasedRepository: TicketPurchasedRepository
 
     final var keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
 
     private final val userDetailsEntity = UserDetails(
+        "usernameTest",
         "nameTest",
         "surnameTest",
         "addressTest",
         LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-        "1234567890"
+        "1234567890",
+        Role.CUSTOMER
     )
 
     val ticketPurchasedEntity = TicketPurchased(
-        Timestamp(System.currentTimeMillis()),
-        Timestamp(System.currentTimeMillis()+ 3600000),
-        "ABC",
-        Jwts.builder()
+        iat = Timestamp(System.currentTimeMillis()),
+        exp = Timestamp(System.currentTimeMillis() + 3600000),
+        zid = "ABC",
+        jws = Jwts.builder()
             .setSubject(userDetailsEntity.username)
             .setIssuedAt(Date.from(Instant.now()))
             .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-            .signWith(Keys.hmacShaKeyFor(keyTicket.toByteArray())).compact()
+            .signWith(Keys.hmacShaKeyFor(keyTicket.toByteArray())).compact(),
+        userDetails = userDetailsEntity
     )
 
     @BeforeEach
-    @Test
     fun createUserDetailsAndTicketPurchased(){
         userDetailsRepository.save(userDetailsEntity)
-        userDetailsEntity.addTicket(ticketPurchasedEntity)
-
-        val userDetailsFound = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!.toDTO()
-        val countTicketPurchased = userDetailsEntity.tickets.count()
-
-        assertEquals(userDetailsEntity.toDTO(), userDetailsFound)
-        assertEquals(1, countTicketPurchased)
+        ticketPurchasedRepository.save(ticketPurchasedEntity)
     }
 
     @Test
     fun userDetailsExist(){
-        val userDetailsActual = userDetailsRepository.existsById(userDetailsEntity.username)
+        val userDetailsFound = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!.toDTO()
+        val countTicketPurchased = ticketPurchasedRepository.findByUserDetails(userDetailsEntity).count()
 
-        assertEquals(true, userDetailsActual)
+        assertEquals(userDetailsEntity.toDTO(), userDetailsFound)
+        assertEquals(1, countTicketPurchased)
     }
 
     @Test
@@ -91,6 +92,7 @@ class RepositoriesTest {
     @AfterEach
     @Test
     fun deleteUserDetails(){
+        ticketPurchasedRepository.deleteAllByUserDetails(userDetailsEntity)
         userDetailsRepository.delete(userDetailsEntity)
 
         val userDetailsFound = userDetailsRepository.existsById(userDetailsEntity.username)
@@ -98,7 +100,6 @@ class RepositoriesTest {
     }
 
 
- */
 }
 
 

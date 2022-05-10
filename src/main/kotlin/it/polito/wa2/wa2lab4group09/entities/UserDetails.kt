@@ -1,6 +1,5 @@
 package it.polito.wa2.wa2lab4group09.entities
 
-import it.polito.wa2.wa2lab4group09.security.Role
 import javax.persistence.*
 
 
@@ -17,7 +16,7 @@ class UserDetails(
     var role: Role
 ) {
 
-    @OneToMany(mappedBy = "userDetails")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userDetails")
     val tickets = mutableSetOf<TicketPurchased>()
 
     fun addTicket(t : TicketPurchased): TicketPurchased {
@@ -25,4 +24,8 @@ class UserDetails(
         tickets.add(t)
         return t
     }
+}
+
+enum class Role{
+    CUSTOMER,ADMIN
 }

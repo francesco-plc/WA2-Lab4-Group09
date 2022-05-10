@@ -4,6 +4,8 @@ import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
+import it.polito.wa2.wa2lab4group09.entities.Role
+
 object JwtUtils {
 
     fun validateJwtToken (authToken: String, key: String): Boolean{
@@ -29,8 +31,4 @@ object JwtUtils {
             throw IllegalArgumentException("${e.message}")
         }
     }
-}
-
-enum class Role{
-    CUSTOMER,ADMIN
 }
