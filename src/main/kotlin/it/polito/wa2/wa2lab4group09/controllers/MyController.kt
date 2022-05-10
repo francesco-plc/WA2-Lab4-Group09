@@ -43,7 +43,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping("/my/tickets", produces = [MediaType.APPLICATION_NDJSON_VALUE])
     fun getUserTickets(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
@@ -56,7 +56,7 @@ class MyController(val userDetailsService: UserDetailsService) {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @PostMapping("/my/tickets")
     fun buyTickets(@RequestHeader("Authorization") jwt:String, @RequestBody actionTicket: ActionTicket) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
