@@ -3,6 +3,7 @@ package it.polito.wa2.wa2lab4group09.services
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import it.polito.wa2.wa2lab4group09.controllers.ActionTicket
+import it.polito.wa2.wa2lab4group09.controllers.UserDetailsUpdate
 import it.polito.wa2.wa2lab4group09.dtos.TicketPurchasedDTO
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
@@ -35,7 +36,7 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
         val authentication = SecurityContextHolder.getContext().authentication
         println(authentication.name)
         println(authentication.authorities.first().toString())
-        val role = if(authentication.authorities.first().toString()=="CUSTOMER") Role.CUSTOMER else Role.ADMIN
+        val role = if(authentication.authorities.first().toString()=="ROLE_CUSTOMER") Role.CUSTOMER else Role.ADMIN
         val userDetail = userDetailsRepository.findById(authentication.name).unwrap()
         return if(userDetail == null){
             userDetailsRepository.save(UserDetails(authentication.name, role= role))
@@ -45,17 +46,20 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     }
 
     @Transactional
-    fun updateUserDetails(jwt:String, userDetailsDTO: UserDetailsDTO){
-        if(!userDetailsRepository.existsById(JwtUtils.getDetailsFromJwtToken(jwt,key).username)) {
-            userDetailsRepository.save(UserDetails(userDetailsDTO.username, role= userDetailsDTO.role))
+    fun updateUserDetails(jwt:String, userDetailsUpdate: UserDetailsUpdate){
+        val username = JwtUtils.getDetailsFromJwtToken(jwt, key).username
+        println("ciaooooo $username")
+        if(!userDetailsRepository.existsById(username)) {
+            userDetailsRepository.save(UserDetails(username, role= JwtUtils.getDetailsFromJwtToken(jwt, key).role))
         }
+
         userDetailsRepository.updateUserDetails(
-            userDetailsDTO.name,
-            userDetailsDTO.surname,
-            userDetailsDTO.address,
-            userDetailsDTO.date_of_birth.toString(),
-            userDetailsDTO.telephone_number,
-            JwtUtils.getDetailsFromJwtToken(jwt, key).username
+            userDetailsUpdate.name,
+            userDetailsUpdate.surname,
+            userDetailsUpdate.address,
+            userDetailsUpdate.date_of_birth,
+            userDetailsUpdate.telephone_number,
+            username
         )
 
     }

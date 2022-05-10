@@ -31,13 +31,14 @@ class MyController(val userDetailsService: UserDetailsService) {
 
     @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     @PutMapping("/my/profile")
-    fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsDTO: UserDetailsDTO) : ResponseEntity<Any>{
+    fun updateUserDetails(@RequestHeader("Authorization") jwt:String, @RequestBody userDetailsUpdate: UserDetailsUpdate) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
         return try {
-            userDetailsService.updateUserDetails(newToken,userDetailsDTO)
+            userDetailsService.updateUserDetails(newToken,userDetailsUpdate)
             ResponseEntity(HttpStatus.OK)
         } catch (t : Throwable){
             val error = ErrorMessage(t.message)
+            println(error)
             ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }
@@ -72,3 +73,4 @@ class MyController(val userDetailsService: UserDetailsService) {
 data class ActionTicket(val cmd : String, val quantity : Int, val zones : String)
 //to return a JSON-shaped error
 data class ErrorMessage(val error: String?)
+data class UserDetailsUpdate(val name : String?, val surname : String?, val address : String?, val date_of_birth : String?, val telephone_number : String?)

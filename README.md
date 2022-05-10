@@ -20,7 +20,7 @@ curl -X POST -d '{"provisionalId":"{provisionalId}","activationCode":"{activatio
 
 Now set in the DB the Role of this user equal to 1 in order to obtain the ADMIN privilege
 
-In order to login the user, execute the following command:
+In order to log in the user, execute the following command:
 ```
 curl -X POST -d '{"username":"USER1","password":"Passw0rd!"}' -v -i 'http://localhost:8080/user/login' -H "Content-Type: application/json"
 ```
