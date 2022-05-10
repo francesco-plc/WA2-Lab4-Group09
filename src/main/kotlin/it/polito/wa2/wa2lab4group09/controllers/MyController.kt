@@ -1,6 +1,5 @@
 package it.polito.wa2.wa2lab4group09.controllers
 
-import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.services.UserDetailsService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -38,7 +37,6 @@ class MyController(val userDetailsService: UserDetailsService) {
             ResponseEntity(HttpStatus.OK)
         } catch (t : Throwable){
             val error = ErrorMessage(t.message)
-            println(error)
             ResponseEntity(error, HttpStatus.BAD_REQUEST)
         }
     }

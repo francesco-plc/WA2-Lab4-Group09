@@ -12,14 +12,11 @@ class AdminController(val adminService: AdminService) {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/travelers")
     fun getTravelers(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
-        println(jwt)
         val newToken = jwt.replace("Bearer", "")
-        println(newToken)
         return try {
             val body = adminService.getTravelers(newToken)
             ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
-            println("${t.message}")
             ResponseEntity("${t.message}", HttpStatus.BAD_REQUEST)
         }
     }
@@ -27,14 +24,11 @@ class AdminController(val adminService: AdminService) {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/traveler/{userID}/profile")
     fun getTravelerProfile(@PathVariable userID:String, @RequestHeader("Authorization") jwt:String) :  ResponseEntity<Any>{
-        println(jwt)
         val newToken = jwt.replace("Bearer", "")
-        println(newToken)
         return try {
             val body = adminService.getTravelerProfile(newToken, userID)
             ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
-            println("${t.message}")
             ResponseEntity("${t.message}", HttpStatus.BAD_REQUEST)
         }
     }
@@ -47,7 +41,6 @@ class AdminController(val adminService: AdminService) {
             val body = adminService.getTravelerTickets(newToken, userID)
             ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
-            println("${t.message}")
             ResponseEntity("${t.message}", HttpStatus.BAD_REQUEST)
         }
     }

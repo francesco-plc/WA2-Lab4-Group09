@@ -22,10 +22,7 @@ object JwtUtils {
             //jwt automatically control that the expiry timestamp (named “exp”) is still valid
             val jwt = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(key.toByteArray())).build().parseClaimsJws(authToken)
             val subject = jwt.body.subject
-            println(jwt.body["role"])
             val role = if(jwt.body["role"]=="CUSTOMER") Role.CUSTOMER else Role.ADMIN
-            println(role)
-            println(subject)
             return UserDetailsDTO(subject, role = role)
 
         }catch (e : JwtException){

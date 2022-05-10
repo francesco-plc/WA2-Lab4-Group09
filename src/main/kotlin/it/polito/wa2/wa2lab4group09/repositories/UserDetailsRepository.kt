@@ -10,7 +10,13 @@ import org.springframework.stereotype.Repository
 interface UserDetailsRepository: CrudRepository<UserDetails, String> {
 
     @Modifying
-    @Query("update UserDetails set name = COALESCE(:newName, name) , surname = COALESCE(:newSurname, surname), address = COALESCE(:newAddress, address), date_of_birth = COALESCE(:newDate_of_birth, date_of_birth), telephone_number = COALESCE(:new_number, telephone_number) where username = :username")
+    @Query("update UserDetails set " +
+            "name=(CASE WHEN :newName IS NULL THEN name ELSE :newName END), " +
+            "surname = (CASE WHEN :newSurname IS NULL THEN surname ELSE :newSurname END), " +
+            "address = (CASE WHEN :newAddress IS NULL THEN address ELSE :newAddress END), " +
+            "date_of_birth = (CASE WHEN :newDate_of_birth IS NULL THEN date_of_birth ELSE :newDate_of_birth END), " +
+            "telephone_number = (CASE WHEN :new_number IS NULL THEN telephone_number ELSE :new_number END) " +
+            "where username = :username")
     fun updateUserDetails(newName : String?, newSurname:String?, newAddress:String?, newDate_of_birth : String?, new_number: String?, username : String)
 
     @Query("select username from UserDetails")

@@ -46,7 +46,7 @@ curl --request GET -H "Authorization: {Bearer...}" -v -i  http://localhost:8081/
 ```
 - PUT "/my/profile"
 ```
-curl --request PUT -H "curl --request POST -H "Authorization: {Bearer...}" -H "Accept: application/json" -H "Content-Type:application/json" -d '{"name":"Mario","surname":"Rossi","address":"via dei test Torino","date_of_birth":"01/01/1990","telephone_number":"1231231231"}' -v -i  http://localhost:8081/my/profile
+ curl --request PUT --header "Authorization: {Bearer...}" -H "Accept: application/json" -H "Content-Type:application/json" -d '{"name":"Mario","surname":"Rossi","address":"via dei test Torino","date_of_birth":"01/01/1990","telephone_number":"1231231231"}' -v -i  http://localhost:8081/my/profile
 ```
 - GET "/my/tickets"
 ```
@@ -59,7 +59,7 @@ curl --request POST -H "curl --request POST -H "Authorization: {Bearer...}" -H "
 
 ---
 
-In order to login with the admin, execute the following commands:
+In order to log in with the admin, execute the following commands:
 ```
 curl -X POST -d '{"username":"ADMIN","password":"Passw0rd!"}' -v -i 'http://localhost:8080/user/login' -H "Content-Type: application/json"
 ```

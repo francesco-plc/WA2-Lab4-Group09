@@ -48,7 +48,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     @Transactional
     fun updateUserDetails(jwt:String, userDetailsUpdate: UserDetailsUpdate){
         val username = JwtUtils.getDetailsFromJwtToken(jwt, key).username
-        println("ciaooooo $username")
         if(!userDetailsRepository.existsById(username)) {
             userDetailsRepository.save(UserDetails(username, role= JwtUtils.getDetailsFromJwtToken(jwt, key).role))
         }
