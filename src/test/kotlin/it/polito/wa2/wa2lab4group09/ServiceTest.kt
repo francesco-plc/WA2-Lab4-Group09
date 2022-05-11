@@ -17,6 +17,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.test.context.support.WithMockUser
 import java.sql.Timestamp
 import java.time.Instant
 import java.time.LocalDate
@@ -26,69 +27,71 @@ import java.util.*
 
 @SpringBootTest
 class ServiceTest {
-//    @Autowired
-//    lateinit var userDetailsRepository: UserDetailsRepository
-//
-//    @Autowired
-//    lateinit var ticketPurchasedRepository: TicketPurchasedRepository
-//
-//    @Autowired
-//    lateinit var userDetailsService: UserDetailsService
-//
-//    private final var _keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
-//
-//    private final var _keyUser = "laboratorio4webapplications2ProfessorGiovanniMalnati"
-//
-//    private final val userDetailsEntity = UserDetails(
-//        "usernameTest",
-//        "nameTest",
-//        "surnameTest",
-//        "addressTest",
-//        LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-//        "1234567890",
-//        Role.CUSTOMER
-//    )
-//
-//    val ticketPurchasedEntity = TicketPurchased(
-//        iat = Timestamp(System.currentTimeMillis()),
-//        exp = Timestamp(System.currentTimeMillis() + 3600000),
-//        zid = "ABC",
-//        jws = Jwts.builder()
-//            .setSubject(userDetailsEntity.username)
-//            .setIssuedAt(Date.from(Instant.now()))
-//            .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-//            .signWith(Keys.hmacShaKeyFor(_keyTicket.toByteArray())).compact(),
-//        userDetails = userDetailsEntity
-//    )
-//
-//
-//    fun generateUserToken(
-//        key: String,
-//        sub: String? = userDetailsEntity.username,
-//        exp: Date? = Date.from(Instant.now().plus(1, ChronoUnit.HOURS))
-//    ): String {
-//        return Jwts.builder()
-//            .setSubject(sub)
-//            .setIssuedAt(Date.from(Instant.now()))
-//            .setExpiration(exp)
-//            .claim("role", Role.CUSTOMER)
-//            .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
-//    }
-//
-//    @BeforeEach
-//    fun createUserDetails(){
-//        userDetailsRepository.save(userDetailsEntity)
-//        ticketPurchasedRepository.save(ticketPurchasedEntity)
-//    }
-//
+    @Autowired
+    lateinit var userDetailsRepository: UserDetailsRepository
+
+    @Autowired
+    lateinit var ticketPurchasedRepository: TicketPurchasedRepository
+
+    @Autowired
+    lateinit var userDetailsService: UserDetailsService
+
+    private final var _keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
+
+    private final var _keyUser = "laboratorio4webapplications2ProfessorGiovanniMalnati"
+
+    private final val userDetailsEntity = UserDetails(
+        "usernameTest",
+        "nameTest",
+        "surnameTest",
+        "addressTest",
+        LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+        "1234567890",
+        Role.CUSTOMER
+    )
+
+    val ticketPurchasedEntity = TicketPurchased(
+        iat = Timestamp(System.currentTimeMillis()),
+        exp = Timestamp(System.currentTimeMillis() + 3600000),
+        zid = "ABC",
+        jws = Jwts.builder()
+            .setSubject(userDetailsEntity.username)
+            .setIssuedAt(Date.from(Instant.now()))
+            .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+            .signWith(Keys.hmacShaKeyFor(_keyTicket.toByteArray())).compact(),
+        userDetails = userDetailsEntity
+    )
+
+
+    fun generateUserToken(
+        key: String,
+        sub: String? = userDetailsEntity.username,
+        exp: Date? = Date.from(Instant.now().plus(1, ChronoUnit.HOURS))
+    ): String {
+        return Jwts.builder()
+            .setSubject(sub)
+            .setIssuedAt(Date.from(Instant.now()))
+            .setExpiration(exp)
+            .claim("role", Role.CUSTOMER)
+            .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
+    }
+
+    @BeforeEach
+    fun createUserDetails(){
+        userDetailsRepository.save(userDetailsEntity).addTicket(ticketPurchasedEntity)
+    }
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun getUserDetailsValidToken(){
+        val userDetailsDTO: UserDetailsDTO = userDetailsService.getUserDetails(generateUserToken(_keyUser))
+
+        assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
+    }
+
+//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
 //    @Test
-//    fun getUserDetailsValidToken(){
-//        val userDetailsDTO: UserDetailsDTO = userDetailsService.getUserDetails(generateUserToken(_keyUser))
-//
-//        assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
-//    }
-//
-//    @Test
+//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
 //    fun getUserDetailsInvalidTokenSignature(){
 //
 //        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -96,133 +99,150 @@ class ServiceTest {
 //        }
 //        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
 //    }
-//
+
+//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
 //    @Test
+//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
 //    fun getUserDetailsInvalidExpiredToken(){
 //        Assertions.assertThrows(IllegalArgumentException::class.java) {
 //            userDetailsService.getUserDetails(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))))
 //        }
 //
 //    }
-//
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun updateExistingUserDetailsValidToken(){
+        val updatedUserDetailsDTO = UserDetailsUpdate(
+            "updatedNameTest",
+            "updatedSurnameTest",
+            "updatedAddressTest",
+            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            "1111111111"
+        )
+
+        userDetailsService.updateUserDetails(generateUserToken(_keyUser), updatedUserDetailsDTO)
+
+        val userDetailFound = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!.toDTO()
+        assertEquals(
+            UserDetailsDTO("usernameTest",updatedUserDetailsDTO.name, updatedUserDetailsDTO.surname,updatedUserDetailsDTO.address, updatedUserDetailsDTO.date_of_birth, updatedUserDetailsDTO.telephone_number, Role.CUSTOMER ),
+            userDetailFound
+        )
+    }
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun updateNewUserDetailsValidToken(){
+        val updatedUserDetailsDTO = UserDetailsUpdate(
+            "updatedNameTest",
+            "updatedSurnameTest",
+            "updatedAddressTest",
+            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            "1111111111"
+        )
+
+        userDetailsService.updateUserDetails(generateUserToken(_keyUser), updatedUserDetailsDTO)
+
+        val userDetailFound: UserDetailsDTO = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!.toDTO()
+        assertEquals(updatedUserDetailsDTO.name, userDetailFound.name)
+        assertEquals(updatedUserDetailsDTO.surname, userDetailFound.surname)
+        assertEquals(updatedUserDetailsDTO.address, userDetailFound.address)
+        assertEquals(updatedUserDetailsDTO.date_of_birth, userDetailFound.date_of_birth)
+        assertEquals(updatedUserDetailsDTO.telephone_number, userDetailFound.telephone_number)
+    }
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun updateUserDetailsInvalidTokenSignature(){
+        val updatedUserDetailsDTO = UserDetailsUpdate(
+            "updatedNameTest",
+            "updatedSurnameTest",
+            "updatedAddressTest",
+            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            "1111111111"
+        )
+
+        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.updateUserDetails(generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"), updatedUserDetailsDTO)
+        }
+        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
+
+    }
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun updateUserDetailsInvalidExpiredToken(){
+        val updatedUserDetailsDTO = UserDetailsUpdate(
+            "updatedNameTest",
+            "updatedSurnameTest",
+            "updatedAddressTest",
+            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            "1111111111"
+        )
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.updateUserDetails(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))), updatedUserDetailsDTO)
+        }
+
+    }
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun getUserTicketsValidToken(){
+        val expectedTickets = userDetailsEntity.tickets.map { it.toDTO() }
+        val actualTicket = userDetailsService.getUserTickets(generateUserToken(_keyUser))
+        assertEquals(expectedTickets, actualTicket)
+    }
+
+//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
 //    @Test
-//    fun updateExistingUserDetailsValidToken(){
-//        val updatedUserDetailsDTO = UserDetailsUpdate(
-//            "updatedNameTest",
-//            "updatedSurnameTest",
-//            "updatedAddressTest",
-//            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-//            "1111111111"
-//        )
-//
-//        userDetailsService.updateUserDetails(generateUserToken(_keyUser), updatedUserDetailsDTO)
-//
-//        val userDetailFound = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!.toDTO()
-//        assertEquals(updatedUserDetailsDTO, userDetailFound)
-//    }
-//
-//    @Test
-//    fun updateNewUserDetailsValidToken(){
-//        val updatedUserDetailsDTO = UserDetailsUpdate(
-//            "updatedNameTest",
-//            "updatedSurnameTest",
-//            "updatedAddressTest",
-//            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-//            "1111111111"
-//        )
-//
-//        userDetailsService.updateUserDetails(generateUserToken(_keyUser), updatedUserDetailsDTO)
-//
-//        val userDetailFound: UserDetailsDTO = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!.toDTO()
-//        assertEquals(updatedUserDetailsDTO.name, userDetailFound.name)
-//        assertEquals(updatedUserDetailsDTO.surname, userDetailFound.surname)
-//        assertEquals(updatedUserDetailsDTO.address, userDetailFound.address)
-//        assertEquals(updatedUserDetailsDTO.date_of_birth, userDetailFound.date_of_birth)
-//        assertEquals(updatedUserDetailsDTO.telephone_number, userDetailFound.telephone_number)
-//    }
-//
-//    @Test
-//    fun updateUserDetailsInvalidTokenSignature(){
-//        val updatedUserDetailsDTO = UserDetailsUpdate(
-//            "updatedNameTest",
-//            "updatedSurnameTest",
-//            "updatedAddressTest",
-//            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-//            "1111111111"
-//        )
-//
-//        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.updateUserDetails(generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"), updatedUserDetailsDTO)
-//        }
-//        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
-//
-//    }
-//
-//    @Test
-//    fun updateUserDetailsInvalidExpiredToken(){
-//        val updatedUserDetailsDTO = UserDetailsUpdate(
-//            "updatedNameTest",
-//            "updatedSurnameTest",
-//            "updatedAddressTest",
-//            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-//            "1111111111"
-//        )
-//
-//        Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.updateUserDetails(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))), updatedUserDetailsDTO)
-//        }
-//
-//    }
-//
-//    @Test
-//    fun getUserTicketsValidToken(){
-//        val expectedTickets = userDetailsEntity.tickets.map { it.toDTO() }
-//        val actualTicket = userDetailsService.getUserTickets(generateUserToken(_keyUser))
-//        assertEquals(expectedTickets, actualTicket)
-//    }
-//
-//    @Test
+//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
 //    fun getUserTicketsInvalidTokenSignature(){
 //        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
 //            userDetailsService.getUserTickets(generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"))
 //        }
 //        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
 //    }
-//
+
+//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
 //    @Test
+//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
 //    fun getUserTicketsInvalidExpiredToken(){
 //
 //        Assertions.assertThrows(IllegalArgumentException::class.java) {
 //            userDetailsService.getUserTickets(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))))
 //        }
 //    }
-//
-//
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun buyTicketValidTokenAndCommand(){
+
+        val actualTickets = userDetailsService.buyTickets(
+            generateUserToken(_keyUser),
+            ActionTicket("buy_tickets", 3, "ABC")
+        )
+
+        val expectedTickets = ticketPurchasedRepository.findByUserDetails(userDetailsEntity).map{it.toDTO()}
+        assertEquals(expectedTickets, actualTickets)
+    }
+
+    @Test
+    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
+    fun buyTicketInvalidCommand(){
+
+        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userDetailsService.buyTickets(
+                generateUserToken(_keyUser),
+                ActionTicket("ThisIsAnInvalidCommand", 3, "ABC")
+            )
+        }
+        assertEquals("action is not supported", exception.message.toString())
+    }
+
+//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
 //    @Test
-//    fun buyTicketValidTokenAndCommand(){
-//
-//        val actualTickets = userDetailsService.buyTickets(
-//            generateUserToken(_keyUser),
-//            ActionTicket("buy_tickets", 3, "ABC")
-//        )
-//
-//        val expectedTickets = ticketPurchasedRepository.findByUserDetails(userDetailsEntity).map{it.toDTO()}
-//        assertEquals(expectedTickets, actualTickets)
-//    }
-//
-//    @Test
-//    fun buyTicketInvalidCommand(){
-//
-//        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.buyTickets(
-//                generateUserToken(_keyUser),
-//                ActionTicket("ThisIsAnInvalidCommand", 3, "ABC")
-//            )
-//        }
-//        assertEquals("action is not supported", exception.message.toString())
-//    }
-//
-//    @Test
+//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
 //    fun buyTicketInvalidTokenSignature(){
 //
 //        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -233,8 +253,10 @@ class ServiceTest {
 //        }
 //        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
 //    }
-//
+
+//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
 //    @Test
+//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
 //    fun buyTicketsInvalidExpiredToken(){
 //
 //        Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -244,12 +266,12 @@ class ServiceTest {
 //            )
 //        }
 //    }
-//
-//
-//    @AfterEach
-//    fun deleteUserDetails(){
-//        ticketPurchasedRepository.deleteAllByUserDetails(userDetailsEntity)
-//        userDetailsRepository.delete(userDetailsEntity)
-//    }
-//
+
+
+    @AfterEach
+    fun deleteUserDetails(){
+        ticketPurchasedRepository.deleteAllByUserDetails(userDetailsEntity)
+        userDetailsRepository.delete(userDetailsEntity)
+    }
+
 }
