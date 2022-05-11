@@ -46,7 +46,7 @@ curl --request GET -H "Authorization: {Bearer...}" -v -i  http://localhost:8081/
 ```
 - PUT "/my/profile"
 ```
- curl --request PUT --header "Authorization: {Bearer...}" -H "Accept: application/json" -H "Content-Type:application/json" -d '{"name":"Mario","surname":"Rossi","address":"via dei test Torino","date_of_birth":"01/01/1990","telephone_number":"1231231231"}' -v -i  http://localhost:8081/my/profile
+ curl --request PUT -H "Authorization: {Bearer...}" -H "Accept: application/json" -H "Content-Type:application/json" -d '{"name":"Mario","surname":"Rossi","address":"via dei test Torino","date_of_birth":"01/01/1990","telephone_number":"1231231231"}' -v -i  http://localhost:8081/my/profile
 ```
 - GET "/my/tickets"
 ```
@@ -54,7 +54,7 @@ curl --request GET -H "Authorization: {Bearer...}" -v -i  http://localhost:8081/
 ```
 - POST "/my/tickets"
 ```
-curl --request POST -H "curl --request POST -H "Authorization: {Bearer...}" -H "Accept: application/json" -H "Content-Type:application/json" -d '{"cmd":"buy_tickets","quantity":"3","zones":"ABC"}' -v -i  http://localhost:8081/my/tickets
+curl --request POST -H "Authorization: {Bearer...}" -H "Accept: application/json" -H "Content-Type:application/json" -d '{"cmd":"buy_tickets","quantity":"3","zones":"ABC"}' -v -i  http://localhost:8081/my/tickets
 ```
 
 ---
@@ -78,12 +78,12 @@ curl GET -v -i 'http://localhost:8081/admin/travelers' -H "Authorization:{Bearer
 
 - GET /admin/traveler/{userID}/profile 
 ```
-curl GET -v -i 'http://localhost:8081/admin/traveler/TEST1/profile' -H "Authorization:{Bearer...} "
+curl GET -v -i 'http://localhost:8081/admin/traveler/USER1/profile' -H "Authorization:{Bearer...}"
 ```
 The endpoint will return the profile corresponding to userID. 
 
 - GET /admin/traveler/{userID}/tickets → returns the tickets owned by userID.
 ```
-curl GET -v -i 'http://localhost:8081/admin/traveler/TEST1/tickets' -H "Authorization:{Bearer...} "
+curl GET -v -i 'http://localhost:8081/admin/traveler/USER1/tickets' -H "Authorization:{Bearer...}"
 ```
 The endpoint will return the tickets owned by userID
