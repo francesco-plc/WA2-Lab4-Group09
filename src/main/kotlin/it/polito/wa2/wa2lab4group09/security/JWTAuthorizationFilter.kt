@@ -44,7 +44,6 @@ class JWTAuthorizationFilter(
             authorities.add(SimpleGrantedAuthority("ROLE_"+userDetailsDTO.role.toString()))
             UsernamePasswordAuthenticationToken(userDetailsDTO.username, null, authorities)
         } catch (e: Exception) {
-            println(e)
             return null
         }
     }

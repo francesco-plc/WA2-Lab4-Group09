@@ -35,7 +35,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
         //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val authentication = SecurityContextHolder.getContext().authentication
         val role = if(authentication.authorities.first().toString()=="ROLE_CUSTOMER") Role.CUSTOMER else Role.ADMIN
-        println(role)
         val userDetail = userDetailsRepository.findById(authentication.name).unwrap()
         return if(userDetail == null){
             userDetailsRepository.save(UserDetails(authentication.name, role= role))

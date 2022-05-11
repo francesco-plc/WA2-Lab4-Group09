@@ -1,6 +1,5 @@
 package it.polito.wa2.wa2lab4group09.entities
 
-import org.hibernate.annotations.GenericGenerator
 import java.sql.Timestamp
 import java.util.*
 import javax.persistence.*
