@@ -19,7 +19,8 @@ class MyController(val userDetailsService: UserDetailsService) {
     fun getUserDetails(@RequestHeader("Authorization") jwt:String) : ResponseEntity<Any>{
         val newToken = jwt.replace("Bearer", "")
         return try {
-            val body = userDetailsService.getUserDetails(newToken)
+            val userDetailsDTO = userDetailsService.getUserDetails(newToken)
+            val body = UserDetailsUpdate(userDetailsDTO.name,userDetailsDTO.surname,userDetailsDTO.address,userDetailsDTO.date_of_birth,userDetailsDTO.telephone_number)
             ResponseEntity(body, HttpStatus.OK)
         } catch (t : Throwable){
             val error = ErrorMessage(t.message)

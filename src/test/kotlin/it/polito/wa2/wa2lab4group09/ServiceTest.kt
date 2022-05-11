@@ -49,6 +49,13 @@ class ServiceTest {
         "1234567890",
         Role.CUSTOMER
     )
+    private final val userDetailsUpdateEntity = UserDetailsUpdate(
+        "nameTest",
+        "surnameTest",
+        "addressTest",
+        LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+        "1234567890"
+    )
 
     val ticketPurchasedEntity = TicketPurchased(
         iat = Timestamp(System.currentTimeMillis()),
@@ -85,8 +92,8 @@ class ServiceTest {
     @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
     fun getUserDetailsValidToken(){
         val userDetailsDTO: UserDetailsDTO = userDetailsService.getUserDetails(generateUserToken(_keyUser))
-
-        assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
+        val userDetailsUpdate = UserDetailsUpdate(userDetailsDTO.name,userDetailsDTO.surname,userDetailsDTO.address,userDetailsDTO.date_of_birth,userDetailsDTO.telephone_number)
+        assertEquals(userDetailsUpdateEntity, userDetailsUpdate)
     }
 
 //    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
