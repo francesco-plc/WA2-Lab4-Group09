@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import it.polito.wa2.wa2lab4group09.controllers.ActionTicket
 import it.polito.wa2.wa2lab4group09.controllers.UserDetailsUpdate
+import it.polito.wa2.wa2lab4group09.dtos.TicketPurchasedDTO
 import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.dtos.toDTO
 import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
@@ -11,6 +12,7 @@ import it.polito.wa2.wa2lab4group09.entities.UserDetails
 import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
 import it.polito.wa2.wa2lab4group09.entities.Role
+import it.polito.wa2.wa2lab4group09.services.AdminService
 import it.polito.wa2.wa2lab4group09.services.UserDetailsService
 import it.polito.wa2.wa2lab4group09.services.unwrap
 import org.junit.jupiter.api.*
@@ -36,6 +38,9 @@ class ServiceTest {
     @Autowired
     lateinit var userDetailsService: UserDetailsService
 
+    @Autowired
+    lateinit var adminService: AdminService
+
     private final var _keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
 
     private final var _keyUser = "laboratorio4webapplications2ProfessorGiovanniMalnati"
@@ -49,6 +54,17 @@ class ServiceTest {
         "1234567890",
         Role.CUSTOMER
     )
+
+    private final val adminEntity = UserDetails(
+        "adminUsernameTest",
+        "adminNameTest",
+        "adminSurnameTest",
+        "adminAddressTest",
+        LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+        "1234567890",
+        Role.ADMIN
+    )
+
     private final val userDetailsUpdateEntity = UserDetailsUpdate(
         "nameTest",
         "surnameTest",
@@ -83,9 +99,22 @@ class ServiceTest {
             .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
     }
 
+    fun generateAdminToken(
+        key: String,
+        sub: String? = adminEntity.username,
+        exp: Date? = Date.from(Instant.now().plus(1, ChronoUnit.HOURS))
+    ): String {
+        return Jwts.builder()
+            .setSubject(sub)
+            .setIssuedAt(Date.from(Instant.now()))
+            .setExpiration(exp)
+            .claim("role", Role.ADMIN)
+            .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
+    }
     @BeforeEach
     fun createUserDetails(){
         userDetailsRepository.save(userDetailsEntity).addTicket(ticketPurchasedEntity)
+        userDetailsRepository.save(adminEntity)
     }
 
     @Test
@@ -279,6 +308,27 @@ class ServiceTest {
     fun deleteUserDetails(){
         ticketPurchasedRepository.deleteAllByUserDetails(userDetailsEntity)
         userDetailsRepository.delete(userDetailsEntity)
+        userDetailsRepository.delete(adminEntity)
     }
+
+
+    @Test
+    fun getTravelers(){
+        val usernames: List<String> = adminService.getTravelers(generateAdminToken(_keyUser))
+        assertEquals("USER1", usernames[0])
+    }
+
+    @Test
+    fun getTravelerProfile(){
+        val userDetailsDTO: UserDetailsDTO = adminService.getTravelerProfile(generateAdminToken(_keyUser), userDetailsEntity.username)
+        assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
+    }
+
+    /*
+    @Test
+    fun getTravelerTickets(){
+        val ticketsPurchasedDTO: List<TicketPurchasedDTO> = adminService.getTravelerTickets(generateAdminToken(_keyUser), userDetailsEntity.username)
+        assertEquals(ticketPurchasedEntity.toDTO(), ticketsPurchasedDTO[0])
+    }*/
 
 }

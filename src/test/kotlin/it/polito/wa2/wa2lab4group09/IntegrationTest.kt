@@ -10,18 +10,19 @@ import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
 import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.server.LocalServerPort
-import org.springframework.http.*
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.web.util.UriComponentsBuilder
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -104,6 +105,35 @@ class IntegrationTest {
             .setExpiration(exp)
             .claim("role", Role.CUSTOMER)
             .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
+    }
+
+    private final val adminEntity = UserDetails(
+        "adminUsernameTest",
+        "adminNameTest",
+        "adminSurnameTest",
+        "adminAddressTest",
+        LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+        "1234567890",
+        Role.ADMIN
+    )
+
+    fun generateAdminToken(
+        key: String,
+        sub: String? = adminEntity.username,
+        exp: Date? = Date.from(Instant.now().plus(1, ChronoUnit.HOURS))
+    ): String {
+        return Jwts.builder()
+            .setSubject(sub)
+            .setIssuedAt(Date.from(Instant.now()))
+            .setExpiration(exp)
+            .claim("role", Role.ADMIN)
+            .signWith(Keys.hmacShaKeyFor(key.toByteArray())).compact()
+    }
+
+    @BeforeEach
+    fun createUserDetails(){
+        userDetailsRepository.save(userDetailsEntity).addTicket(ticketPurchasedEntity)
+        userDetailsRepository.save(adminEntity)
     }
 
     @Test
@@ -226,6 +256,82 @@ class IntegrationTest {
         val requestEntity = HttpEntity<Unit>(headers)
         val response = restTemplate.exchange(
             "http://localhost:$port/my/tickets", HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
+    }
+
+    @Test
+    fun getTravelersValid() {
+        val headers = HttpHeaders()
+        val tkn = generateAdminToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<Unit>(headers)
+        val response = restTemplate.exchange(
+            "http://localhost:$port/admin/travelers", HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.OK, response.statusCode)
+    }
+
+    @Test
+    fun getTravelersInvalid() {
+        val headers = HttpHeaders()
+        val tkn = generateUserToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<Unit>(headers)
+        val response = restTemplate.exchange(
+            "http://localhost:$port/admin/travelers", HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
+    }
+
+    @Test
+    fun getTravelerProfileValid() {
+        val headers = HttpHeaders()
+        val tkn = generateAdminToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<Unit>(headers)
+        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/profile"
+        val response = restTemplate.exchange(
+            url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.OK, response.statusCode)
+    }
+
+    @Test
+    fun getTravelerProfileInvalid() {
+        val headers = HttpHeaders()
+        val tkn = generateUserToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<Unit>(headers)
+        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/profile"
+        val response = restTemplate.exchange(
+            url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
+    }
+
+    @Test
+    fun getTravelerTicketsValid() {
+        val headers = HttpHeaders()
+        val tkn = generateAdminToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<Unit>(headers)
+        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/tickets"
+        val response = restTemplate.exchange(
+            url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.OK, response.statusCode)
+    }
+
+    @Test
+    fun getTravelerTicketsInvalid() {
+        val headers = HttpHeaders()
+        val tkn = generateUserToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<Unit>(headers)
+        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/tickets"
+        val response = restTemplate.exchange(
+            url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
         )
         Assertions.assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
     }
