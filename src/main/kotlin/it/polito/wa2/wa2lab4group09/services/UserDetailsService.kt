@@ -72,6 +72,7 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     fun buyTickets(jwt: String, actionTicket: ActionTicket): List<TicketPurchasedDTO> {
         val userDetailsDTO = getUserDetails(jwt)
         val tickets = mutableListOf<TicketPurchasedDTO>()
+        if (actionTicket.quantity <=0 ) throw IllegalArgumentException("Quantity must be greater than zero")
         if (actionTicket.cmd == "buy_tickets"){
             for (i in 1..actionTicket.quantity){
                 val token = Jwts.builder()
