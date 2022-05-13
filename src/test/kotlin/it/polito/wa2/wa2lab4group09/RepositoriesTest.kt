@@ -90,6 +90,14 @@ class RepositoriesTest {
         assertEquals( "1111111111", userDetailsFound.telephone_number)
     }
 
+    @Test
+    @Transactional
+    fun findTicket(){
+        val tickets= ticketPurchasedRepository.findByUserDetails(userDetailsEntity)
+        assertEquals( ticketPurchasedEntity.exp, tickets[0].exp)
+        assertEquals( ticketPurchasedEntity.iat, tickets[0].iat)
+        assertEquals( ticketPurchasedEntity.zid, tickets[0].zid)
+    }
 
     @AfterEach
     @Test

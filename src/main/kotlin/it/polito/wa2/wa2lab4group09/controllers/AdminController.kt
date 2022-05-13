@@ -44,5 +44,4 @@ class AdminController(val adminService: AdminService) {
             ResponseEntity("${t.message}", HttpStatus.BAD_REQUEST)
         }
     }
-
 }
