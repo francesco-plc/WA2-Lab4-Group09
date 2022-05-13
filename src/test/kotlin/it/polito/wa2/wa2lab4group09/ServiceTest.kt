@@ -247,11 +247,6 @@ class ServiceTest {
         assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
     }
 
-/*    @Test
-    fun getTravelerTickets(){
-        val ticketsPurchasedDTO: List<TicketPurchasedDTO> = adminService.getTravelerTickets(generateAdminToken(_keyUser), userDetailsEntity.username)
-        assertEquals(ticketPurchasedEntity.toDTO(), ticketsPurchasedDTO[0])
-    }*/
 
     @AfterEach
     fun deleteUserDetails(){
