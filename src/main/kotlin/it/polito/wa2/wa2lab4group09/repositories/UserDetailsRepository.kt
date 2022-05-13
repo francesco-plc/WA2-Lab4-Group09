@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserDetailsRepository: CrudRepository<UserDetails, String> {
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update UserDetails set " +
             "name=(CASE WHEN :newName IS NULL THEN name ELSE :newName END), " +
             "surname = (CASE WHEN :newSurname IS NULL THEN surname ELSE :newSurname END), " +

@@ -125,27 +125,6 @@ class ServiceTest {
         assertEquals(userDetailsUpdateEntity, userDetailsUpdate)
     }
 
-//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
-//    @Test
-//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
-//    fun getUserDetailsInvalidTokenSignature(){
-//
-//        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.getUserDetails(generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"))
-//        }
-//        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
-//    }
-
-//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
-//    @Test
-//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
-//    fun getUserDetailsInvalidExpiredToken(){
-//        Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.getUserDetails(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))))
-//        }
-//
-//    }
-
     @Test
     @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
     fun updateExistingUserDetailsValidToken(){
@@ -230,26 +209,6 @@ class ServiceTest {
         assertEquals(expectedTickets, actualTicket)
     }
 
-//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
-//    @Test
-//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
-//    fun getUserTicketsInvalidTokenSignature(){
-//        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.getUserTickets(generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"))
-//        }
-//        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
-//    }
-
-//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
-//    @Test
-//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
-//    fun getUserTicketsInvalidExpiredToken(){
-//
-//        Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.getUserTickets(generateUserToken(_keyUser, exp = Date.from(Instant.now().minus(1, ChronoUnit.HOURS))))
-//        }
-//    }
-
     @Test
     @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
     fun buyTicketValidTokenAndCommand(){
@@ -276,33 +235,23 @@ class ServiceTest {
         assertEquals("action is not supported", exception.message.toString())
     }
 
-//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
-//    @Test
-//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
-//    fun buyTicketInvalidTokenSignature(){
-//
-//        val exception: IllegalArgumentException  = Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.buyTickets(
-//                generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"),
-//                ActionTicket("buy_tickets", 3, "ABC")
-//            )
-//        }
-//        assertEquals("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.", exception.message.toString())
-//    }
+    @Test
+    fun getTravelers(){
+        val usernames: List<String> = adminService.getTravelers(generateAdminToken(_keyUser))
+        assertEquals("usernameTest", usernames[0])
+    }
 
-//    Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
-//    @Test
-//    @WithMockUser(username = "usernameTest", password = "pwd", roles = ["CUSTOMER"])
-//    fun buyTicketsInvalidExpiredToken(){
-//
-//        Assertions.assertThrows(IllegalArgumentException::class.java) {
-//            userDetailsService.buyTickets(
-//                generateUserToken("ChiaveErrataUtileSoloATestareQuestaFunzioneInutile"),
-//                ActionTicket("buy_tickets", 3, "ABC")
-//            )
-//        }
-//    }
+    @Test
+    fun getTravelerProfile(){
+        val userDetailsDTO: UserDetailsDTO = adminService.getTravelerProfile(generateAdminToken(_keyUser), userDetailsEntity.username)
+        assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
+    }
 
+/*    @Test
+    fun getTravelerTickets(){
+        val ticketsPurchasedDTO: List<TicketPurchasedDTO> = adminService.getTravelerTickets(generateAdminToken(_keyUser), userDetailsEntity.username)
+        assertEquals(ticketPurchasedEntity.toDTO(), ticketsPurchasedDTO[0])
+    }*/
 
     @AfterEach
     fun deleteUserDetails(){
@@ -312,23 +261,6 @@ class ServiceTest {
     }
 
 
-    @Test
-    fun getTravelers(){
-        val usernames: List<String> = adminService.getTravelers(generateAdminToken(_keyUser))
-        assertEquals("USER1", usernames[0])
-    }
 
-    @Test
-    fun getTravelerProfile(){
-        val userDetailsDTO: UserDetailsDTO = adminService.getTravelerProfile(generateAdminToken(_keyUser), userDetailsEntity.username)
-        assertEquals(userDetailsEntity.toDTO(), userDetailsDTO)
-    }
-
-    /*
-    @Test
-    fun getTravelerTickets(){
-        val ticketsPurchasedDTO: List<TicketPurchasedDTO> = adminService.getTravelerTickets(generateAdminToken(_keyUser), userDetailsEntity.username)
-        assertEquals(ticketPurchasedEntity.toDTO(), ticketsPurchasedDTO[0])
-    }*/
 
 }

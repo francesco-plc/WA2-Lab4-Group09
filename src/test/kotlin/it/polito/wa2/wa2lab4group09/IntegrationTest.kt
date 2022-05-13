@@ -8,7 +8,6 @@ import it.polito.wa2.wa2lab4group09.dtos.UserDetailsDTO
 import it.polito.wa2.wa2lab4group09.entities.Role
 import it.polito.wa2.wa2lab4group09.entities.TicketPurchased
 import it.polito.wa2.wa2lab4group09.entities.UserDetails
-import it.polito.wa2.wa2lab4group09.repositories.TicketPurchasedRepository
 import it.polito.wa2.wa2lab4group09.repositories.UserDetailsRepository
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +21,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.web.util.UriComponentsBuilder
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -63,9 +61,6 @@ class IntegrationTest {
 
     @Autowired
     lateinit var userDetailsRepository: UserDetailsRepository
-
-    @Autowired
-    lateinit var ticketPurchasedRepository: TicketPurchasedRepository
 
     private final var _keyUser = "laboratorio4webapplications2ProfessorGiovanniMalnati"
 
@@ -290,7 +285,7 @@ class IntegrationTest {
         val tkn = generateAdminToken(_keyUser)
         headers.set("Authorization", "Bearer$tkn")
         val requestEntity = HttpEntity<Unit>(headers)
-        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/profile"
+        val url = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/profile"
         val response = restTemplate.exchange(
             url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
         )
@@ -303,7 +298,7 @@ class IntegrationTest {
         val tkn = generateUserToken(_keyUser)
         headers.set("Authorization", "Bearer$tkn")
         val requestEntity = HttpEntity<Unit>(headers)
-        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/profile"
+        val url = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/profile"
         val response = restTemplate.exchange(
             url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
         )
@@ -316,7 +311,7 @@ class IntegrationTest {
         val tkn = generateAdminToken(_keyUser)
         headers.set("Authorization", "Bearer$tkn")
         val requestEntity = HttpEntity<Unit>(headers)
-        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/tickets"
+        val url = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/tickets"
         val response = restTemplate.exchange(
             url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
         )
@@ -329,7 +324,7 @@ class IntegrationTest {
         val tkn = generateUserToken(_keyUser)
         headers.set("Authorization", "Bearer$tkn")
         val requestEntity = HttpEntity<Unit>(headers)
-        val url: String = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/tickets"
+        val url = "http://localhost:$port/admin/traveler/${userDetailsEntity.username}/tickets"
         val response = restTemplate.exchange(
             url, HttpMethod.GET, requestEntity, Any::class.java, Any::class.java
         )

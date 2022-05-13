@@ -31,7 +31,7 @@ class RepositoriesTest {
     @Autowired
     lateinit var ticketPurchasedRepository: TicketPurchasedRepository
 
-    final var keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
+    private final var keyTicket = "questachievavieneutilizzataperfirmareiticketsLab4"
 
     private final val userDetailsEntity = UserDetails(
         "usernameTest",
@@ -73,19 +73,21 @@ class RepositoriesTest {
     @Test
     @Transactional
     fun updateUserDetails(){
-        val entity = userDetailsRepository.findAll()
-
         userDetailsRepository.updateUserDetails(
-            "newName",
-            "newSurname",
-            "newAddress",
-            LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            "1111111111",
-            entity.last().username
+            newName = "newName",
+            newSurname = "newSurname",
+            newAddress = "newAddress",
+            newDate_of_birth = LocalDate.of(1990,12,12).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            new_number = "1111111111",
+            username = "usernameTest"
         )
 
-        val userDetailsFound = userDetailsRepository.existsById(entity.last().username)
-        assertEquals( true, userDetailsFound)
+        val userDetailsFound = userDetailsRepository.findById(userDetailsEntity.username).unwrap()!!
+        assertEquals( "newName", userDetailsFound.name)
+        assertEquals( "newSurname", userDetailsFound.surname)
+        assertEquals( "newAddress", userDetailsFound.address)
+        assertEquals("12-12-1990", userDetailsFound.date_of_birth)
+        assertEquals( "1111111111", userDetailsFound.telephone_number)
     }
 
 
