@@ -2,10 +2,13 @@
 
 ## Instructions for launching the application
 1. Configure the docker container
-2. Open the project,in another window, in folder WA2-Lab3-Group09 
-3. Run this project, it will run in port 8080
-4. Open the project in folder WA2-Lab4-Group09
-5. Run this project, it will run in port 8081
+2. Open Database section on Intellij and create a connection with the postgres container.
+3. Right-click on the database and add a new one (New -> Database -> Ok)
+4. Open the project, in another window, in folder WA2-Lab3-Group09 
+5. Modify the application properties with the options that you have just set
+6. Run this project, it will run in port 8080
+7. Open the project in folder WA2-Lab4-Group09
+8. Run this project, it will run in port 8081
 ## Instructions to use the application
 #### Registration of a user 
 In order to create a user with username 'USER1' execute those commands:
