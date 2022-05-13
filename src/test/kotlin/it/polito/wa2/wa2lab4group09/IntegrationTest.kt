@@ -231,6 +231,21 @@ class IntegrationTest {
     }
 
     @Test
+    fun buyTicketsInvalidQuantity() {
+        val headers = HttpHeaders()
+        val tkn = generateUserToken(_keyUser)
+        headers.set("Authorization", "Bearer$tkn")
+        val requestEntity = HttpEntity<ActionTicket>(
+            ActionTicket("buy_tickets", -10, "ABC"),
+            headers
+        )
+        val response = restTemplate.exchange(
+            "http://localhost:$port/my/tickets", HttpMethod.POST, requestEntity, Any::class.java, Any::class.java
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+    }
+
+    @Test
     fun getUserTicketsValid() {
 
         val headers = HttpHeaders()
