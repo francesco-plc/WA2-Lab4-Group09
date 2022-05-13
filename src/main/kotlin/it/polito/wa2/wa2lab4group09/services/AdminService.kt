@@ -15,14 +15,12 @@ class AdminService(val userDetailsRepository: UserDetailsRepository, val ticketP
     lateinit var key: String
 
     fun getTravelers(jwt:String): List<String> {
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val travelers = mutableListOf<String>()
         userDetailsRepository.getUsers().forEach { travelers.add(it) }
         return travelers
     }
 
     fun getTravelerProfile(jwt:String, userID:String): UserDetailsDTO {
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val userDetail = userDetailsRepository.findById(userID).unwrap()
         if (userDetail == null)
             throw IllegalArgumentException("User doesn't exist!")
@@ -31,7 +29,6 @@ class AdminService(val userDetailsRepository: UserDetailsRepository, val ticketP
     }
 
     fun getTravelerTickets(jwt:String, userID:String): List<TicketPurchasedDTO> {
-        if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val tickets = mutableListOf<TicketPurchasedDTO>()
         val userDetail = userDetailsRepository.findById(userID).unwrap()
         if (userDetail == null)

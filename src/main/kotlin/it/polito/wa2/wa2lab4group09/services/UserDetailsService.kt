@@ -32,7 +32,6 @@ class UserDetailsService(val userDetailsRepository: UserDetailsRepository, val t
     lateinit var keyTicket : String
 
     fun getUserDetails(jwt : String): UserDetailsDTO {
-        //if(!JwtUtils.validateJwtToken(jwt,key)) throw IllegalArgumentException("Token is not valid or is expired")
         val authentication = SecurityContextHolder.getContext().authentication
         val role = if(authentication.authorities.first().toString()=="ROLE_CUSTOMER") Role.CUSTOMER else Role.ADMIN
         val userDetail = userDetailsRepository.findById(authentication.name).unwrap()

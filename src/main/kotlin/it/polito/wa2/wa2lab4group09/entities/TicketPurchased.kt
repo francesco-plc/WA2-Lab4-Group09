@@ -8,8 +8,6 @@ import javax.persistence.*
 @Table(name="ticket_purchased")
 class TicketPurchased (
     @Id
-//    @GeneratedValue(generator = "uuid2")
-//    @GenericGenerator(name="uuid2", strategy="uuid2")
     var sub: UUID = UUID.randomUUID(),
     var iat: Timestamp,
     var exp: Timestamp,
